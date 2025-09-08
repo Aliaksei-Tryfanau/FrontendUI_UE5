@@ -1,6 +1,6 @@
 ﻿// 
 
-#include "Widgets/Comonents/FrontendCommonButtonBase.h"
+#include "FrontendUI/Public/Widgets/Components/FrontendCommonButtonBase.h"
 #include "CommonTextBlock.h"
 #include "Subsystems/FrontendUISubsystem.h"
 
