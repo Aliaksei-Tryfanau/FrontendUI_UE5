@@ -7,7 +7,7 @@
 #include "OptionsDataRegistry.generated.h"
 
 class UListDataObject_Collection;
-
+class UListDataObject_Base;
 
 /**
  * 
@@ -21,7 +21,9 @@ public:
 	//Gets called by options screen right after the object of type UOptionsDataRegistry is created
 	void InitOptionsDataRegistry(ULocalPlayer* InOwningLocalPlayer);
 
-	const TArray<UListDataObject_Collection*>& GetRegisteredOptionsTabCollections() const { return RegisteredOptionsTabCollections;}
+	const TArray<UListDataObject_Collection*>& GetRegisteredOptionsTabCollections() const { return RegisteredOptionsTabCollections; }
+
+	TArray<UListDataObject_Base*> GetListSourceItemsBySelectedTabID(const FName& InSelectedTabID) const;
 
 private:
 	void InitGameplayCollectionTab();

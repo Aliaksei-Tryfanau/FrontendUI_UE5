@@ -8,6 +8,7 @@
 
 class UOptionsDataRegistry;
 class UFrontendTabListWidgetBase;
+class UFrontendCommonListView;
 
 /**
  * 
@@ -39,6 +40,9 @@ private:
 	//***** Bound Widgets ***** //
 	UPROPERTY(meta = (BindWidget))
 	UFrontendTabListWidgetBase* TabListWidget_OptionsTabs;
+
+	UPROPERTY(meta = (BindWidget))
+	UFrontendCommonListView* CommonListView_OptionsList;
 	//***** Bound Widgets ***** //
 
 	//Handle the creation of data in the options screen. Direct access to this variable is forbidden
