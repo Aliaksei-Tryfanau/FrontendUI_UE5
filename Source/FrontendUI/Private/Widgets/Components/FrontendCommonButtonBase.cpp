@@ -45,3 +45,13 @@ void UFrontendCommonButtonBase::NativePreConstruct()
 	
 	SetButtonText(ButtonDisplayText);
 }
+
+FText UFrontendCommonButtonBase::GetButtonDisplayText() const
+{	
+	if (CommonTextBlock_ButtonText)
+	{
+		return CommonTextBlock_ButtonText->GetText();
+	}
+	
+	return FText();
+}

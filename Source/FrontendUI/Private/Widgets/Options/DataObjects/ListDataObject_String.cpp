@@ -3,6 +3,7 @@
 
 #include "FrontendUI/Public/Widgets/Options/DataObjects/ListDataObject_String.h"
 #include "Widgets/Options/OptionsDataInteractionHelper.h"
+#include "FrontendDebugHelper.h"
 
 void UListDataObject_String::AddDynamicOption(const FString& InStringValue, const FText& InDisplayText)
 {
@@ -17,7 +18,10 @@ void UListDataObject_String::OnDataObjectInitialized()
 		CurrentStringValue = AvailableOptionsStringArray[0];
 	}
 
-	//TODO::Read from the saved string value and use it to set the CurrentStringValue
+	if (HasDefaultValue())
+	{
+		CurrentStringValue = GetDefaultValueAsString();
+	}
 
 	if (DataDynamicGetter)
 	{
@@ -26,7 +30,7 @@ void UListDataObject_String::OnDataObjectInitialized()
 			CurrentStringValue = DataDynamicGetter->GetValueAsString();
 		}
 	}
-
+	
 	if (!TrySetDisplayTextFromStringValue(CurrentStringValue))
 	{
 		CurrentDisplayText = FText::FromString(TEXT("Invalid Option"));
@@ -102,4 +106,50 @@ void UListDataObject_String::BackToPreviousOption()
 		DataDynamicSetter->SetValueFromString(CurrentStringValue);
 		NotifyListDataModified(this);
 	}
+}
+
+void UListDataObject_String::OnRotatorInitiatedValueChange(const FText& InNewSelectedText)
+{
+	const int32 FoundIndex = AvailableOptionsTextArray.IndexOfByPredicate(
+		[InNewSelectedText](const FText& AvailableText)->bool
+		{
+			return AvailableText.EqualTo(InNewSelectedText);
+		}
+	);
+	
+	if (FoundIndex != INDEX_NONE && AvailableOptionsStringArray.IsValidIndex(FoundIndex))
+	{
+		CurrentDisplayText = InNewSelectedText;
+		CurrentStringValue = AvailableOptionsStringArray[FoundIndex];
+
+		if (DataDynamicSetter)
+		{
+			DataDynamicSetter->SetValueFromString(CurrentStringValue);
+			NotifyListDataModified(this);
+		}
+	}
+}
+
+bool UListDataObject_String::CanResetBackToDefaultValue() const
+{
+	return HasDefaultValue() && CurrentStringValue != GetDefaultValueAsString();
+}
+
+bool UListDataObject_String::TryResetBackToDefaultValue()
+{
+	if (CanResetBackToDefaultValue())
+	{
+		CurrentStringValue = GetDefaultValueAsString();
+		TrySetDisplayTextFromStringValue(CurrentStringValue);
+
+		if (DataDynamicSetter)
+		{
+			DataDynamicSetter->SetValueFromString(CurrentStringValue);
+			NotifyListDataModified(this,EOptionsListDataModifyReason::ResetToDefault);
+
+			return true;
+		}
+	}
+	
+	return false;
 }

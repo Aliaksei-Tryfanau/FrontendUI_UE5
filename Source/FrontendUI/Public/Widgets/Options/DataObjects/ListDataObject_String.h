@@ -25,10 +25,16 @@ public:
 	
 	FORCEINLINE FText GetCurrentDisplayText() const { return CurrentDisplayText;}
 
+	void OnRotatorInitiatedValueChange(const FText& InNewSelectedText);
+
 protected:
 	//~ Begin UListDataObject_Base Interface
 	virtual void OnDataObjectInitialized() override;
 	//~ End UListDataObject_Base Interface
+
+	virtual bool CanResetBackToDefaultValue() const override;
+	
+	virtual bool TryResetBackToDefaultValue() override;
 
 	bool TrySetDisplayTextFromStringValue(const FString& InStringValue);
 	

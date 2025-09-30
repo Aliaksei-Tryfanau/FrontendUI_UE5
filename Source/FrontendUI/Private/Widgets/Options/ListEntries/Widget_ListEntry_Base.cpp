@@ -4,11 +4,14 @@
 #include "FrontendUI/Public/Widgets/Options/ListEntries/Widget_ListEntry_Base.h"
 #include "Widgets/Options/DataObjects/ListDataObject_Base.h"
 #include "CommonTextBlock.h"
+#include "Components/ListView.h"
+#include "CommonInputSubsystem.h"
 
 void UWidget_ListEntry_Base::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 	OnOwningListDataObjectSet(CastChecked<UListDataObject_Base>(ListItemObject));
+	SetVisibility(ESlateVisibility::Visible);
 }
 
 void UWidget_ListEntry_Base::OnOwningListDataObjectSet(UListDataObject_Base* InOwningListDataObject)
@@ -24,6 +27,40 @@ void UWidget_ListEntry_Base::OnOwningListDataObjectSet(UListDataObject_Base* InO
 	}
 }
 
+FReply UWidget_ListEntry_Base::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	UCommonInputSubsystem* CommonInputSubsystem = GetInputSubsystem();
+
+	if (CommonInputSubsystem && CommonInputSubsystem->GetCurrentInputType() == ECommonInputType::Gamepad)
+	{
+		if (UWidget* WidgetToFocus = BP_GetWidgetToFocusForGamepad())
+		{	
+			if (TSharedPtr<SWidget> SlateWidgetToFocus = WidgetToFocus->GetCachedWidget())
+			{
+				return FReply::Handled().SetUserFocus(SlateWidgetToFocus.ToSharedRef());
+			}		
+		}
+	}
+	
+	return Super::NativeOnFocusReceived(InGeometry,InFocusEvent);
+}
+
+void UWidget_ListEntry_Base::NativeOnEntryReleased()
+{
+	IUserObjectListEntry::NativeOnEntryReleased();
+	NativeOnListEntryWidgetHovered(false);
+}
+
 void UWidget_ListEntry_Base::OnOwningListDataObjectModified(UListDataObject_Base* OwningModifiedData, EOptionsListDataModifyReason ModifyReason)
 {
+}
+
+void UWidget_ListEntry_Base::SelectThisEntryWidget()
+{
+	CastChecked<UListView>(GetOwningListView())->SetSelectedItem(GetListItem());
+}
+
+void UWidget_ListEntry_Base::NativeOnListEntryWidgetHovered(bool bWasHovered)
+{
+	BP_OnListEntryWidgetHovered(bWasHovered,IsListItemSelected());
 }
