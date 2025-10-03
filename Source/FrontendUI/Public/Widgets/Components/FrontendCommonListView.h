@@ -21,6 +21,8 @@ protected:
 	virtual UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable) override;
 	//~ End UCommonListView Interface
 
+	virtual bool OnIsSelectableOrNavigableInternal(UObject* FirstSelectedItem) override;
+
 private:
 	//~ Begin UWidget Interface
 #if WITH_EDITOR	
