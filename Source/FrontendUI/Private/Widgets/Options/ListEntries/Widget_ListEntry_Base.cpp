@@ -25,7 +25,13 @@ void UWidget_ListEntry_Base::OnOwningListDataObjectSet(UListDataObject_Base* InO
 		InOwningListDataObject->OnListDataModified.AddUObject(this,&ThisClass::OnOwningListDataObjectModified);
 	}
 
+	if (!InOwningListDataObject->OnDependencyDataModified.IsBoundToObject(this))
+	{
+		InOwningListDataObject->OnDependencyDataModified.AddUObject(this,&ThisClass::OnOwningDependencyDataObjectModified);
+	}
+
 	OnToggleEditableState(InOwningListDataObject->IsDataCurrentlyEditable());
+	CachedOwningDataObject = InOwningListDataObject;
 }
 
 FReply UWidget_ListEntry_Base::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
@@ -71,5 +77,13 @@ void UWidget_ListEntry_Base::SelectThisEntryWidget()
 
 void UWidget_ListEntry_Base::NativeOnListEntryWidgetHovered(bool bWasHovered)
 {
-	BP_OnListEntryWidgetHovered(bWasHovered,IsListItemSelected());
+	BP_OnListEntryWidgetHovered(bWasHovered, GetListItem()? IsListItemSelected() : false);
+}
+
+void UWidget_ListEntry_Base::OnOwningDependencyDataObjectModified(UListDataObject_Base* OwningModifiedDependencyData, EOptionsListDataModifyReason ModifyReason)
+{	
+	if (CachedOwningDataObject)
+	{
+		OnToggleEditableState(CachedOwningDataObject->IsDataCurrentlyEditable());
+	}
 }
